@@ -134,4 +134,4 @@ pipeline {
             ], propagate: false
         }
     }
-}  // <-- THIS WAS MISSING!
+}
