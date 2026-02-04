@@ -8,7 +8,6 @@ pipeline {
     }
 
     stages {
-
         stage("Workspace cleanup") {
             steps {
                 script {
@@ -52,29 +51,28 @@ pipeline {
         stage("Git: Code update and push to GitHub") {
             steps {
                 script {
+                    // Inject username and PAT
                     withCredentials([usernamePassword(credentialsId: 'githubcredentilas', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASSWORD')]) {
-                        sh """
-                            # Configure Git user for commits
+                        sh '''
                             git config user.email "jenkins@example.com"
                             git config user.name "Jenkins"
 
-                            echo "Checking repository status:"
+                            echo "Checking repository status: "
                             git status
 
-                            echo "Adding changes to git:"
+                            echo "Adding changes to git: "
                             git add kubernetes/backend.yaml kubernetes/frontend.yaml
 
-                            echo "Committing changes:"
+                            echo "Committing changes: "
                             git commit -m "Updated environment variables" || echo "No changes to commit"
 
-                            echo "Pushing changes to GitHub:"
-                            git push https://\$GIT_USER:\$GIT_PASSWORD@github.com/Sahiljg/Wanderlust-Mega-Project.git main
-                        """
+                            echo "Pushing changes to GitHub: "
+                            git push https://$GIT_USER:$GIT_PASSWORD@github.com/Sahiljg/Wanderlust-Mega-Project.git main
+                        '''
                     }
                 }
             }
         }
-
     }
 
     post {
