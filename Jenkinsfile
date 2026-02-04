@@ -21,6 +21,7 @@ pipeline {
                 }
             }
         }
+        
         stage("Workspace cleanup"){
             steps{
                 script{
@@ -96,13 +97,13 @@ pipeline {
         stage("Docker: Build Images"){
             steps{
                 script{
-                        dir('backend'){
-                            docker_build("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","gandhisahil11")
-                        }
-                    
-                        dir('frontend'){
-                            docker_build("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","gandhisahil11")
-                        }
+                    dir('backend'){
+                        docker_build("wanderlust-backend-beta","${params.BACKEND_DOCKER_TAG}","gandhisahil11")
+                    }
+                
+                    dir('frontend'){
+                        docker_build("wanderlust-frontend-beta","${params.FRONTEND_DOCKER_TAG}","gandhisahil11")
+                    }
                 }
             }
         }
@@ -116,13 +117,21 @@ pipeline {
             }
         }
     }
-    post{
-        success{
+    
+    post {
+        success {
             archiveArtifacts artifacts: '*.xml', followSymlinks: false
             build job: "Wanderlust-CD", parameters: [
                 string(name: 'FRONTEND_DOCKER_TAG', value: "${params.FRONTEND_DOCKER_TAG}"),
                 string(name: 'BACKEND_DOCKER_TAG', value: "${params.BACKEND_DOCKER_TAG}")
             ]
         }
+        unstable {
+            archiveArtifacts artifacts: '*.xml', followSymlinks: false
+            build job: "Wanderlust-CD", parameters: [
+                string(name: 'FRONTEND_DOCKER_TAG', value: "${params.FRONTEND_DOCKER_TAG}"),
+                string(name: 'BACKEND_DOCKER_TAG', value: "${params.BACKEND_DOCKER_TAG}")
+            ], propagate: false
+        }
     }
-}
+}  // <-- THIS WAS MISSING!
